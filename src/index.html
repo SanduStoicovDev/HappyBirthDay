@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanti Auguri!</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* CSS Reset e Variabili */
+        :root {
+            --bg-color: #fdf2f8; /* Rosa chiarissimo */
+            --accent-color: #db2777; /* Rosa scuro */
+            --text-color: #1f2937;
+            --box-color: #ef4444;
+            --ribbon-color: #fbbf24;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Evita scrollbar durante le animazioni */
+        }
+
+        /* Container principale */
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Stile del Pacco Regalo */
+        .gift-box-container {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .gift-box-container:active {
+            transform: scale(0.95);
+        }
+
+        .gift-box {
+            font-size: 100px;
+            user-select: none;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Stile del Messaggio (nascosto inizialmente) */
+        .message-card {
+            display: none; /* Hidden state */
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 80%;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .message-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            animation: pulse 2s infinite;
+        }
+
+        /* Animazioni Keyframes */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Utility class per nascondere elementi */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="gift-trigger" class="gift-box-container">
+        <div class="gift-box">🎁</div>
+        <div class="hint">Tocca per aprire!</div>
+    </div>
+
+    <div id="greeting-card" class="message-card">
+        <h1>Buon Compleanno! 🎉</h1>
+        <p>
+            Tanti auguri di cuore!<br>
+            Spero che la tua giornata sia speciale<br>
+            quanto te.
+        </p>
+        <p style="font-size: 0.8rem; margin-top: 1.5rem; color: #999;">
+            (Fatto con ❤️ e un po' di codice)
+        </p>
+    </div>
+</div>
+
+<script>
+    /**
+     * Logica dell'applicazione.
+     * Gestisce il click, l'animazione di transizione e l'effetto coriandoli.
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+        const giftTrigger = document.getElementById('gift-trigger');
+        const greetingCard = document.getElementById('greeting-card');
+
+        giftTrigger.addEventListener('click', () => {
+            // 1. Nascondi il regalo
+            giftTrigger.classList.add('hidden');
+
+            // 2. Mostra la card del messaggio
+            greetingCard.style.display = 'block';
+
+            // Piccolo timeout per permettere al browser di renderizzare il display:block prima dell'opacity
+            // Questo abilita la transizione CSS
+            setTimeout(() => {
+                greetingCard.classList.add('visible');
+                launchConfetti();
+            }, 50);
+        });
+
+        // Funzione per generare i coriandoli (usando canvas-confetti)
+        function launchConfetti() {
+            const duration = 3000; // 3 secondi
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const random = (min, max) => Math.random() * (max - min) + min;
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                // Spara coriandoli da due punti casuali
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    });
+</script>
+</body>
+</html>
